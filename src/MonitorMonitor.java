@@ -3,17 +3,13 @@ import java.util.Set;
 
 public class MonitorMonitor {
 
-    public static void main(String[] args) throws IOException, InterruptedException {
-        final String basepath = "/home/mihalyl/Documents/log_monitoring/";
-        final Set<Instance> instanceSet = Instance.getInstanceSet();
-
+    public static void main(String[] args) {
+        String whatYouLookingFor = "test failed";
+        String folderToSearch = "/temp_check";
+        final String basePath = "/home/mihalyl/Documents/log_monitoring/";
         final String date = Preparator.getDateInRightFormat();
-
-        Preparator preparator = new Preparator(basepath, instanceSet);
-//        preparator.getDailyFiles(date);
-        Animator animator = new Animator();
-//        animator.animateBar();
-        Executor executor = new Executor(date, basepath);
+        final Set<Instance> instanceSet = Instance.getInstanceSet(folderToSearch, date, whatYouLookingFor);
+        Executor executor = new Executor(date, basePath, whatYouLookingFor);
         executor.filter(instanceSet);
     }
 }

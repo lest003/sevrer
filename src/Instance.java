@@ -39,45 +39,11 @@ public class Instance {
     extend directoryForLogFiles
     extend serverFileNames
      */
-    public static Set<Instance> getInstanceSet() {
-        Instance t1client = new Instance("_t1_client", Arrays.asList("/logfiles/test/client/"),
-                "LMTGRAS1/backup/result/middletier/2021", Arrays.asList("*/*.gras.clientExceptionsGroup.log"));
-        Instance t1error = new Instance("_t1_error", Arrays.asList("/logfiles/test/error/"),
-                "LMTGRAS1/backup/result/middletier/2021", Arrays.asList("*/*.gras.errorGroup.log"));
-        Instance cmb_t1 = new Instance("_cmb_t1_error", Arrays.asList("/logfiles/cmb_t1/"),
-                "LMTCMB1/backup/result/middletier/2021", Arrays.asList("*/*.gras.errorGroup.log"));
-        Instance i1client = new Instance("_i1_client", Arrays.asList("/logfiles/int/client/"),
-                "LMIGRAS1/backup/result/middletier/2021", Arrays.asList("*/*.gras.clientExceptionsGroup.log"));
-        Instance i1error = new Instance("_i1_error", Arrays.asList("/logfiles/int/error/"),
-                "LMIGRAS1/backup/result/middletier/2021", Arrays.asList("*/*.gras.errorGroup.log"));
-        Instance f1client = new Instance("_f1_client", Arrays.asList("/logfiles/func/client/"),
-                "LMFGRAS1/backup/result/middletier/2021", Arrays.asList("*/*.gras.clientExceptionsGroup.log"));
-        Instance f1error = new Instance("_f1_error", Arrays.asList("/logfiles/func/error/"),
-                "LMFGRAS1/backup/result/middletier/2021", Arrays.asList("*/*.gras.errorGroup.log"));
-        Instance cmb_i1 = new Instance("_cmb_i1_error", Arrays.asList("/logfiles/cmb_i1/"),
-                "LMICMB1/backup/result/middletier/2021", Arrays.asList("*/*.gras.errorGroup.log"));
-        Instance t1bclient = new Instance("_t1_b_client", Arrays.asList("/logfiles/test_b/client/"),
-                "LMTGRAS1B/backup/result/middletier/2021", Arrays.asList("*/*.gras.clientExceptionsGroup.log"));
-        Instance t1berror = new Instance("_t1_b_error", Arrays.asList("/logfiles/test_b/error/"),
-                "LMTGRAS1B/backup/result/middletier/2021", Arrays.asList("*/*.gras.errorGroup.log"));
-        Set<Instance> instanceSet = new HashSet<Instance>(Arrays.asList(
-                t1client, t1error, cmb_t1, i1client, i1error, f1client, f1error, cmb_i1, t1bclient, t1berror));
-
-        //      TODO new instances here, instantiate and add to instanceSet
-//        Instance i2client = new Instance("_i2_client", Arrays.asList("/int/client/"),
-//                "LMIGRAS2/backup/result/middletier/2021", Arrays.asList("*/*.gras.clientExceptionsGroup.log"));
-//        Instance i2error = new Instance("_i2_error", Arrays.asList("/int/error/"),
-//                "LMIGRAS2/backup/result/middletier/2021", Arrays.asList("*/*.gras.errorGroup.log"));
-
-
-        // TODO local file search
-//      to search the unfiltered
-//        instanceSet.clear();
-//        Instance finder = new Instance("_found", Arrays.asList("/elder"),
-//                "/home/mihalyl/Documents/log_monitoring/", Arrays.asList("*.*"));
-//       instanceSet.add(finder);
-
-
+    public static Set<Instance> getInstanceSet(String folderToSearch, String date, String whatYouLookingFor) {
+        // TODO local file search in elder folder
+        Instance finder = new Instance(whatYouLookingFor + "_" + date, Arrays.asList(folderToSearch),
+                "/home/mihalyl/Documents/log_monitoring/", Arrays.asList("*unfiltered"));
+        Set<Instance> instanceSet = new HashSet<Instance>(Arrays.asList(finder));
         return instanceSet;
     }
 }

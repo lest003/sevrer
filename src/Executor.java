@@ -14,27 +14,22 @@ public class Executor {
 
     private final String basePath;
     private final String date;
+    private final String whatYouLookingFor;
 
-    public Executor(String date, String basePath) {
+    public Executor(String date, String basePath, String whatYouLookingFor) {
         this.date = date;
         this.basePath = basePath;
+        this.whatYouLookingFor = whatYouLookingFor;
     }
 
     public void filter(Set<Instance> instanceSet) {
-        System.out.println("\nthe filtered files will be saved at: \n" + basePath + date + "/");
-        prepareActionable();
-
         for (Instance instance : instanceSet) {
             String path = basePath + date + "/";
-//             TODO local file search use next line
-//            String filePathAndName = basePath + "/" + instance.getFilteredFilename();
-            String filePathAndName = basePath + date + "/" + date + instance.getFilteredFilename();
+            String filePathAndName = basePath + "/" + instance.getFilteredFilename();
             try (FileWriter myUnfilteredWriter = new FileWriter(path + "/nofilter/"
                     + date + instance.getFilteredFilename() + "_unfiltered");
                  FileWriter myWriter = new FileWriter(filePathAndName)) {
-                // TODO local file search use next line
-//                String folder = basePath +  instance.getDirectoriesForLogFiles().get(0);
-                String folder = basePath + date + instance.getDirectoriesForLogFiles().get(0);
+                String folder = basePath + instance.getDirectoriesForLogFiles().get(0);
                 System.out.println(folder);
                 List<File> files = new ArrayList<>();
                 List<File> listOfFiles = getListOfFiles(folder, files);
@@ -44,20 +39,14 @@ public class Executor {
 
                 unSevere(parsedErrors);
 
-                List<ErrorGroup> errorGroups = ErrorGroup.getErrorGroups();
+                List<ErrorGroup> errorGroups = ErrorGroup.getErrorGroups(whatYouLookingFor);
                 List<String> unGroupedErrors = separateGroupedFromUngrouped(parsedErrors, errorGroups);
 
                 List<String> sortedErrors = sortGroupedErrors(errorGroups);
-                // TODO local file search cut next 4 lines
-                filterAndCountMathcingHashes(unGroupedErrors);
-                List<String> trimmedErrors = groupSameSizedErrors(unGroupedErrors);
-                sortTrimmedErrrs(trimmedErrors, sortedErrors);
-                sortUngroupedErrors(unGroupedErrors, sortedErrors);
 
                 writeToFile(sortedErrors, myWriter);
-
-//                setFileReadOnly(filePathAndName);
-
+                System.out.println(sortedErrors.size());
+                System.out.println(sortedErrors);
             } catch (IOException e) {
                 e.printStackTrace();
             }
@@ -86,7 +75,8 @@ public class Executor {
         if (fList != null)
             for (File file : fList) {
                 if (file.isFile()) {
-                    files.add(file);
+                    if (file.getName().endsWith("log"))
+                        files.add(file);
                 } else if (file.isDirectory()) {
                     getListOfFiles(file.getAbsolutePath(), files);
                 }
@@ -103,6 +93,8 @@ public class Executor {
                 while ((line = br.readLine()) != null) {
                     if (!line.contains("[NO_USER]"))
                         sb.append(line).append("\n");
+                    if (line.contains("HASH_"))
+                        sb.append("@:").append(file.getPath()).append("\n");
                     if (line.contains("---END")) {
                         sb.append("\n");
                         allErrors.add(sb.toString());
@@ -153,9 +145,9 @@ public class Executor {
             if (!groupsErrors.isEmpty()) {
                 sortedErrors.add(errorGroups.get(i).getGroupMarker());
                 if (errorGroups.get(i).getKeepHash())
-                    cutAroundNoformatKeepHash(groupsErrors);
+                    cutAroundNoFormatKeepHash(groupsErrors);
                 else
-                    cutAroundNoformat(groupsErrors);
+                    cutAroundNoFormat(groupsErrors);
                 sortByLength(groupsErrors);
                 sortedErrors.addAll(groupsErrors);
             }
@@ -179,7 +171,7 @@ public class Executor {
         }
     }
 
-    private void cutAroundNoformat(List<String> uglyErrors) {
+    private void cutAroundNoFormat(List<String> uglyErrors) {
         if (!uglyErrors.isEmpty()) {
             for (int i = 0; i < uglyErrors.size(); i++) {
                 String uglyError = uglyErrors.get(i);
@@ -192,7 +184,7 @@ public class Executor {
         }
     }
 
-    private void cutAroundNoformatKeepHash(List<String> uglyErrors) {
+    private void cutAroundNoFormatKeepHash(List<String> uglyErrors) {
         if (!uglyErrors.isEmpty()) {
             for (int i = 0; i < uglyErrors.size(); i++) {
                 String uglyError = uglyErrors.get(i);
@@ -211,7 +203,7 @@ public class Executor {
                 String uglyError = uglyErrors.get(i);
                 String noformat = "{noformat}";
 //                int firstIndex = uglyError.indexOf(noformat);
-                int lastIndex = uglyError.indexOf("----END") -1;
+                int lastIndex = uglyError.indexOf("----END") - 1;
                 String prettyError = uglyError.substring(0, lastIndex);
                 uglyErrors.set(i, prettyError);
             }
@@ -298,14 +290,14 @@ public class Executor {
 
     private void trimSimilarErrorsTogether(List<String> errorsToTrim) {
         List<String> firstError = new ArrayList<>(Arrays.asList(errorsToTrim.get(0)));
-        List<String> lastError = new ArrayList<>(Arrays.asList(errorsToTrim.get(errorsToTrim.size()-1)));
+        List<String> lastError = new ArrayList<>(Arrays.asList(errorsToTrim.get(errorsToTrim.size() - 1)));
 
-        cutAroundNoformatKeepHash(lastError);
+        cutAroundNoFormatKeepHash(lastError);
         cutAfterStart(firstError);
         cutOnlyTheEnd(firstError);
-        cutAroundNoformat(errorsToTrim);
+        cutAroundNoFormat(errorsToTrim);
         errorsToTrim.set(0, firstError.get(0));
-        errorsToTrim.set(errorsToTrim.size()-1, lastError.get(0));
+        errorsToTrim.set(errorsToTrim.size() - 1, lastError.get(0));
         errorsToTrim.set(errorsToTrim.size() - 1, errorsToTrim.get
                 (errorsToTrim.size() - 1).concat("\n\n--------------------------------------------------------------------------\n\n"));
     }

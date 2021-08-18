@@ -33,7 +33,6 @@ public class Executor {
                  FileWriter myWriter = new FileWriter(filePathAndName)) {
 
                 String folder = basePath + date + instance.getDirectoriesForLogFiles().get(0);
-                System.out.println(folder);
                 List<File> files = new ArrayList<>();
                 List<File> listOfFiles = getListOfFiles(folder, files);
 

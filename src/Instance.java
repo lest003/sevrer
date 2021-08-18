@@ -62,6 +62,7 @@ public class Instance {
                 "LMTGRAS1B/backup/result/middletier/2021", Arrays.asList("*/*.gras.errorGroup.log"));
         Set<Instance> instanceSet = new HashSet<Instance>(Arrays.asList(
                 t1client, t1error, cmb_t1, t1bclient, t1berror));
+
         return instanceSet;
     }
 }

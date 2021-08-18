@@ -24,7 +24,6 @@ public class Preparator {
         String serverCommandAndPath = "scp ngd:/GRAS/share/GRASINST/";
         Set<String> commands = new LinkedHashSet<>();
         commands.add("mkdir -p " + basePath + date + "/nofilter/");
-        System.out.println("mkdir -p " + basePath + date + "/nofilter");
         for (Instance i : instanceSet) {
             for (int j = 0; j < i.getServerFileNames().size(); j++) {
                 commands.add("mkdir -p " + basePath + date + i.getDirectoriesForLogFiles().get(j));

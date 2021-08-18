@@ -49,11 +49,12 @@ public class ErrorGroup {
         ErrorGroup dirtyEvalGroup = new ErrorGroup(false, Arrays.asList("A DIRTY evaluation engine CliElEvaluationEngine"),
                 "\n\n---- Possible Evaluation stuck --------------------------------------------\n" +
                         "    https://jira.smedigitalapps.com/jira/browse/GRA-11189\n\n");
-
+        ErrorGroup resultResent5301Times = new ErrorGroup(false, Arrays.asList("Query result response was resent 5301 times"),
+                "\n\n----Query result response was resent 5301 times-----------------------------\n\n");
 
         List<ErrorGroup> errorGroups = new ArrayList<>(Arrays.asList(
                 userRevision, useDescribed, webSocket, alreadyStopped,
-                unDisposedListeners, dirtyEvalGroup));
+                unDisposedListeners, dirtyEvalGroup, resultResent5301Times));
 
 //      TODO temporary stuff
         ErrorGroup psqlErrorGroup = new ErrorGroup(true, Arrays.asList("PSQLException"),

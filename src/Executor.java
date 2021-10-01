@@ -14,6 +14,8 @@ public class Executor {
 
     private final String basePath;
     private final String date;
+    private static final String line = "--------------------------------------------------------------------------";
+    private final String br = "\n";
 
     public Executor(String date, String basePath) {
         this.date = date;
@@ -46,7 +48,6 @@ public class Executor {
 
                 List<String> sortedErrors = sortGroupedErrors(errorGroups);
 
-                filterAndCountMatchingHashes(unGroupedErrors);
                 List<String> trimmedErrors = groupSameSizedErrors(unGroupedErrors);
                 sortTrimmedErrors(trimmedErrors, sortedErrors);
                 sortUngroupedErrors(unGroupedErrors, sortedErrors);
@@ -61,14 +62,12 @@ public class Executor {
 
     private void prepareActionable() {
         try (FileWriter myActionableWriter = new FileWriter(basePath + date + "/" + date + "_actionable")) {
-            String separator = "------------------------------------------------------------------------\n";
-            String placeForText = "\n\n\n\n";
-            List<String> actionableTemplate = new ArrayList<>(Arrays.asList(date + "\n",
+            String separator = line + br;
+            String placeForText = br + br + br + br;
+            List<String> actionableTemplate = new ArrayList<>(Arrays.asList(date + br,
                     separator + "t1\n" + separator + placeForText + separator,
                     separator + "cmb_t1\n" + separator + placeForText + separator,
-                    separator + "i1\n" + separator + placeForText + separator,
-                    separator + "cmb_i1\n" + separator + placeForText + separator,
-                    separator + "f1\n" + separator + placeForText + separator));
+                    separator + "t1b\n" + separator + placeForText + separator));
             writeToFile(actionableTemplate, myActionableWriter);
         } catch (IOException e) {
             e.printStackTrace();
@@ -147,10 +146,7 @@ public class Executor {
             List<String> groupsErrors = errorGroups.get(i).getErrors();
             if (!groupsErrors.isEmpty()) {
                 sortedErrors.add(errorGroups.get(i).getGroupMarker());
-                if (errorGroups.get(i).getKeepHash())
-                    cutAroundNoformatKeepHash(groupsErrors);
-                else
-                    cutAroundNoformat(groupsErrors);
+                cutAroundNoformat(groupsErrors, errorGroups.get(i).getKeepHash());
                 sortByLength(groupsErrors);
                 sortedErrors.addAll(groupsErrors);
             }
@@ -166,7 +162,7 @@ public class Executor {
                 int firstIndex = error.indexOf("\n", 1);
                 int lastIndex = error.indexOf(noformat);
 
-                String blankSpace = "\n\n--------------------------------------------------------------------------\n\n";
+                String blankSpace = br + br + line + br + br;
                 String textToCut = error.substring(firstIndex, lastIndex);
                 error = error.replace(textToCut, blankSpace);
                 errors.set(i, error);
@@ -174,27 +170,16 @@ public class Executor {
         }
     }
 
-    private void cutAroundNoformat(List<String> uglyErrors) {
+    private void cutAroundNoformat(List<String> uglyErrors, boolean keepHash) {
         if (!uglyErrors.isEmpty()) {
             for (int i = 0; i < uglyErrors.size(); i++) {
                 String uglyError = uglyErrors.get(i);
                 String noformat = "{noformat}";
                 int firstIndex = uglyError.indexOf(noformat);
-                int lastIndex = uglyError.lastIndexOf(noformat) + 1;
-                String prettyError = uglyError.substring(firstIndex, lastIndex + noformat.length());
-                uglyErrors.set(i, prettyError);
-            }
-        }
-    }
-
-    private void cutAroundNoformatKeepHash(List<String> uglyErrors) {
-        if (!uglyErrors.isEmpty()) {
-            for (int i = 0; i < uglyErrors.size(); i++) {
-                String uglyError = uglyErrors.get(i);
-                String noformat = "{noformat}";
-                int firstIndex = uglyError.indexOf(noformat);
-                int lastIndex = uglyError.indexOf("----END");
-                String prettyError = uglyError.substring(firstIndex, lastIndex);
+                int lastIndex = keepHash ? uglyError.indexOf("----END") : uglyError.lastIndexOf(noformat) + 1;
+                String prettyError = keepHash
+                        ? uglyError.substring(firstIndex, lastIndex)
+                        : uglyError.substring(firstIndex, lastIndex + noformat.length());
                 uglyErrors.set(i, prettyError);
             }
         }
@@ -204,40 +189,9 @@ public class Executor {
         if (!uglyErrors.isEmpty()) {
             for (int i = 0; i < uglyErrors.size(); i++) {
                 String uglyError = uglyErrors.get(i);
-                int lastIndex = uglyError.indexOf("----END") -1;
+                int lastIndex = uglyError.indexOf("----END") - 1;
                 String prettyError = uglyError.substring(0, lastIndex);
                 uglyErrors.set(i, prettyError);
-            }
-        }
-    }
-
-    private void filterAndCountMatchingHashes(List<String> errors) {
-        for (int i = errors.size() - 1; i >= 0; i--) {
-            String error = errors.get(i);
-            if (error.contains("HASH_<") && (!error.contains("<NoCausedBy>"))) {
-                int sameCauseByCount = 0;
-                int hashStart = error.indexOf("HASH_<");
-                int hashCauseByStart = error.indexOf("<", hashStart + 10);
-                int hashCauseByEnd = error.indexOf("|", hashCauseByStart);
-                String hashCode = error.substring(hashCauseByStart, hashCauseByEnd);
-                for (int j = i - 1; j >= 0; j--) {
-                    if (errors.get(j).contains(hashCode)) {
-                        errors.remove(j);
-                        sameCauseByCount++;
-                        i--;
-                    }
-                }
-                if (sameCauseByCount > 0) {
-                    String messageSingleOrPlural = sameCauseByCount == 1 ? " other time" : " other times";
-                    error = error.substring(0, 75)
-                            + "\n\n--------------------------------------------------------------------------\n"
-                            + "same cause by "
-                            + sameCauseByCount
-                            + messageSingleOrPlural
-                            + "\n--------------------------------------------------------------------------\n"
-                            + error.substring(75);
-                    errors.set(i, error);
-                }
             }
         }
     }
@@ -250,7 +204,7 @@ public class Executor {
         if (!errors.isEmpty()) {
             sortByLength(errors);
             if (!sortedErrors.isEmpty())
-                sortedErrors.add("\n\n----All other errors------------------------------------------------------\n\n");
+                sortedErrors.add(br + br + separateWithLineAndText("All other errors") + br + br);
             sortedErrors.addAll(errors);
 
         }
@@ -258,7 +212,7 @@ public class Executor {
 
     private void sortTrimmedErrors(List<String> trimmedErrors, List<String> sortedErrors) {
         if (!sortedErrors.isEmpty() && !trimmedErrors.isEmpty()) {
-            sortedErrors.add("\n\n----Same same same--------------------------------------------------------\n\n");
+            sortedErrors.add(br + br + separateWithLineAndText("Same same") + br + br);
         }
         sortedErrors.addAll(trimmedErrors);
 
@@ -289,18 +243,18 @@ public class Executor {
 
     }
 
+
     private void trimSimilarErrorsTogether(List<String> errorsToTrim) {
         List<String> firstError = new ArrayList<>(Arrays.asList(errorsToTrim.get(0)));
-        List<String> lastError = new ArrayList<>(Arrays.asList(errorsToTrim.get(errorsToTrim.size()-1)));
+        List<String> lastError = new ArrayList<>(Arrays.asList(errorsToTrim.get(errorsToTrim.size() - 1)));
 
-        cutAroundNoformatKeepHash(lastError);
+        cutAroundNoformat(lastError, true);
         cutAfterStart(firstError);
         cutOnlyTheEnd(firstError);
-        cutAroundNoformat(errorsToTrim);
+        cutAroundNoformat(errorsToTrim, false);
         errorsToTrim.set(0, firstError.get(0));
-        errorsToTrim.set(errorsToTrim.size()-1, lastError.get(0));
-        errorsToTrim.set(errorsToTrim.size() - 1, errorsToTrim.get
-                (errorsToTrim.size() - 1).concat("\n\n--------------------------------------------------------------------------\n\n"));
+        errorsToTrim.set(errorsToTrim.size() - 1, lastError.get(0)
+                .concat(br + br + line + br + br));
     }
 
     private void writeToFile(List<String> errors, FileWriter myWriter) {
@@ -314,4 +268,10 @@ public class Executor {
 
     }
 
+    public static String separateWithLineAndText(String text) {
+        text = " " + text + " ";
+        StringBuilder separator = new StringBuilder(line);
+        separator.replace(4, 4 + text.length(), text);
+        return separator.toString();
+    }
 }

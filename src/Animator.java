@@ -34,14 +34,14 @@ public class Animator {
         anim++;
     }
 
-    public void animateBar() throws InterruptedException {
+    public void animateBar(int downloadTime) throws InterruptedException {
         String progress = " Download in progress  ";
         StringBuilder bar = new StringBuilder();
         bar.append("[                    ]");
         for (int i = 1; i < 21; i++) {
             bar.setCharAt(i, '=');
             animate(progress + bar);
-            Thread.sleep(400);
+            Thread.sleep(downloadTime * 1000/ 21);
         }
     }
 }

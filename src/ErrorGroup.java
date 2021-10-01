@@ -7,6 +7,7 @@ public class ErrorGroup {
     private final List<String> filterPhrases;
     private final String groupMarker;
     private final List<String> errors = new ArrayList<>();
+    private static final String br = "\n";
 
     public ErrorGroup(boolean keepHash, List<String> filterPhrases, String groupMarker) {
         this.keepHash = keepHash;
@@ -31,60 +32,53 @@ public class ErrorGroup {
     }
 
     public static List<ErrorGroup> getErrorGroups() {
-        ErrorGroup userRevision = new ErrorGroup(false, Arrays.asList("Default User Revision"),
-                "\n\n----Default User Revision Errors-------------------------------------------\n" +
-                        "    https://jira.smedigitalapps.com/jira/browse/GRA-16340\n\n");
-        ErrorGroup useDescribed = new ErrorGroup(false, Arrays.asList("Use described configured"),
-                "\n\n----Use described configured errors----------------------------------------\n\n");
+        Executor.separateWithLineAndText("Default User Revision Errors");
+        ErrorGroup userRevision = new ErrorGroup(false, Arrays.asList(
+                "Default User Revision"),
+                br + br + Executor.separateWithLineAndText("Default User Revision Errors") + br +
+                        "    https://jira.smedigitalapps.com/jira/browse/GRA-16340" + br + br);
+        ErrorGroup useDescribed = new ErrorGroup(false, Arrays.asList(
+                "Use described configured"),
+                br + br + Executor.separateWithLineAndText("Default User Revision Errors") + br + br);
         ErrorGroup webSocket = new ErrorGroup(false, Arrays.asList(
                 "WebSocketSession is not attached to the WebSession",
                 "Failed to fire STARTED from WebProcessor",
                 "Failed web processing"),
-                "\n\n----WebSocketSession is not attached errors--------------------------------\n\n");
-        ErrorGroup alreadyStopped = new ErrorGroup(false, Arrays.asList("service has been already stopped"),
-                "\n\n----Service already stopped errors-----------------------------------------\n\n");
-        ErrorGroup unDisposedListeners = new ErrorGroup(false, Arrays.asList("ndisposed listeners"),
-                "\n\n----Undisposed listeners errors--------------------------------------------\n" +
+                br + br + Executor.separateWithLineAndText("WebSocketSession is not attached errors") + br + br);
+        ErrorGroup alreadyStopped = new ErrorGroup(false, Arrays.asList(
+                "service has been already stopped"),
+                br + br + Executor.separateWithLineAndText("Service already stopped errors") + br + br);
+        ErrorGroup unDisposedListeners = new ErrorGroup(false, Arrays.asList(
+                "ndisposed listeners"),
+                br + br + Executor.separateWithLineAndText("Undisposed listeners errors") + br +
                         "    https://jira.smedigitalapps.com/jira/browse/GRA-10097\n\n");
-        ErrorGroup dirtyEvalGroup = new ErrorGroup(false, Arrays.asList("A DIRTY evaluation engine CliElEvaluationEngine"),
-                "\n\n---- Possible Evaluation stuck --------------------------------------------\n" +
+        ErrorGroup dirtyEvalGroup = new ErrorGroup(false, Arrays.asList(
+                "A DIRTY evaluation engine CliElEvaluationEngine"),
+                br + br + Executor.separateWithLineAndText("Possible Evaluation stuck") + br +
                         "    https://jira.smedigitalapps.com/jira/browse/GRA-11189\n\n");
-        ErrorGroup resultResent5301Times = new ErrorGroup(false, Arrays.asList("Query result response was resent 5301 times"),
-                "\n\n----Query result response was resent 5301 times-----------------------------\n\n");
-
-        List<ErrorGroup> errorGroups = new ArrayList<>(Arrays.asList(
-                userRevision, useDescribed, webSocket, alreadyStopped,
-                unDisposedListeners, dirtyEvalGroup, resultResent5301Times));
-
-//      TODO temporary stuff
-        ErrorGroup psqlErrorGroup = new ErrorGroup(true, Arrays.asList("PSQLException"),
-                "\n\n---- PSQL Exceptions  --------------------------------------------\n\n");
-        errorGroups.add(psqlErrorGroup);
-        ErrorGroup referenceColumnErrorGroup = new ErrorGroup(true, Arrays.asList("Referenced column not found for Prod Marketing Hist Session"),
-                "\n\n---- Reference Column errors ----------------------------------------\n\n");
-        errorGroups.add(referenceColumnErrorGroup);
+        ErrorGroup resultResent5301Times = new ErrorGroup(false, Arrays.asList(
+                "Query result response was resent 5301 times"),
+                br + br + Executor.separateWithLineAndText("Query result response was resent 5301 times") + br + br);
+        ErrorGroup failedTests = new ErrorGroup(false, Arrays.asList(
+                "test failed"),
+                br + br + Executor.separateWithLineAndText("Failed tests") + br + br);
+        ErrorGroup psqlErrorGroup = new ErrorGroup(true, Arrays.asList(
+                "PSQLException"),
+                br + br + Executor.separateWithLineAndText("PSQL Exceptions") + br + br);
         ErrorGroup concurrentErrorGroup = new ErrorGroup(true, Arrays.asList(
                 "Concurrent modification",
                 "different user step"),
-                "\n\n---- Concurrent Modification errors-----------------------------------\n\n");
-        errorGroups.add(concurrentErrorGroup);
+                br + br + Executor.separateWithLineAndText("Concurrent Modification errors") + br + br);
         ErrorGroup beanNotFound = new ErrorGroup(true, Arrays.asList(
                 "Bean not found with id"),
-                "\n\n---- Bean not found with id errors -----------------------------------\n\n");
-        errorGroups.add(beanNotFound);
-        ErrorGroup failedToHndlIncMsg = new ErrorGroup(true, Arrays.asList(
-                " Failed to handle incoming message"),
-                "\n\n----  Failed to handle incoming message errors -------------------------\n\n");
-        errorGroups.add(failedToHndlIncMsg);
-        ErrorGroup rowLimitErrors = new ErrorGroup(true, Arrays.asList(
-                "Cannot limit rows in PostgresUpdateDataSource"),
-                "\n\n---- Cannot limit rows in PostgresUpdateDataSource ---------------------\n" +
-                        "---- waiting on PRRev\n\n");
-        errorGroups.add(rowLimitErrors);
+                br + br + Executor.separateWithLineAndText("Bean not found with id errors") + br + br);
+        ErrorGroup failedToHandleIncMsg = new ErrorGroup(true, Arrays.asList(
+                "Failed to handle incoming message"),
+                br + br + Executor.separateWithLineAndText("Failed to handle incoming message errors") + br + br);
 
-        ErrorGroup tempIntErrorGroup = new ErrorGroup(true, Arrays.asList("Higher link of LinkEntity is not the first property"),
-                "\n\n----Temporarily ignored errors--------------------------------------------\n\n");
-        errorGroups.add(tempIntErrorGroup);
+        List<ErrorGroup> errorGroups = new ArrayList<>(Arrays.asList(
+                userRevision, useDescribed, webSocket, alreadyStopped, unDisposedListeners, dirtyEvalGroup,
+                resultResent5301Times, failedTests, psqlErrorGroup, concurrentErrorGroup, beanNotFound, failedToHandleIncMsg));
 
         return errorGroups;
     }

@@ -6,13 +6,13 @@ public class MonitorMonitor {
     public static void main(String[] args) throws IOException, InterruptedException {
         final String basePath = "/home/mihalyl/Documents/log_monitoring/";
         final Set<Instance> instanceSet = Instance.getInstanceSet();
-
         final String date = Preparator.getDateInRightFormat();
+        final int downloadTimeInSec = 15;
 
         Preparator preparator = new Preparator(basePath, instanceSet);
         preparator.getDailyFiles(date);
         Animator animator = new Animator();
-        animator.animateBar();
+        animator.animateBar(downloadTimeInSec);
         Executor executor = new Executor(date, basePath);
         executor.filter(instanceSet);
     }

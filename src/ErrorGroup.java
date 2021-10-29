@@ -59,7 +59,7 @@ public class ErrorGroup {
         ErrorGroup resultResent5301Times = new ErrorGroup(false, Arrays.asList(
                 "Query result response was resent 5301 times"),
                 br + br + Executor.separateWithLineAndText("Query result response was resent 5301 times") + br + br);
-        ErrorGroup failedTests = new ErrorGroup(false, Arrays.asList(
+        ErrorGroup failedTests = new ErrorGroup(true, Arrays.asList(
                 "test failed"),
                 br + br + Executor.separateWithLineAndText("Failed tests") + br + br);
         ErrorGroup psqlErrorGroup = new ErrorGroup(true, Arrays.asList(

@@ -52,7 +52,7 @@ public class ErrorGroup {
                 "ndisposed listeners"),
                 br + br + Executor.separateWithLineAndText("Undisposed listeners errors") + br +
                         "    https://jira.smedigitalapps.com/jira/browse/GRA-10097\n\n");
-        ErrorGroup dirtyEvalGroup = new ErrorGroup(false, Arrays.asList(
+        ErrorGroup dirtyEvalGroup = new ErrorGroup(true, Arrays.asList(
                 "A DIRTY evaluation engine CliElEvaluationEngine"),
                 br + br + Executor.separateWithLineAndText("Possible Evaluation stuck") + br +
                         "    https://jira.smedigitalapps.com/jira/browse/GRA-11189\n\n");

@@ -1,7 +1,4 @@
-import java.util.Arrays;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 
 public class Instance {
 
@@ -39,29 +36,23 @@ public class Instance {
     extend directoryForLogFiles
     extend serverFileNames
      */
-    public static Set<Instance> getInstanceSet() {
-        Instance t1client = new Instance("_t1_client", Arrays.asList("/logfiles/test/client/"),
-                "LMTGRAS1/backup/result/middletier/2021", Arrays.asList("*/*.gras.clientExceptionsGroup.log"));
-        Instance t1error = new Instance("_t1_error", Arrays.asList("/logfiles/test/error/"),
-                "LMTGRAS1/backup/result/middletier/2021", Arrays.asList("*/*.gras.errorGroup.log"));
-        Instance cmb_t1 = new Instance("_cmb_t1_error", Arrays.asList("/logfiles/cmb_t1/"),
-                "LMTCMB1/backup/result/middletier/2021", Arrays.asList("*/*.gras.errorGroup.log"));
-        Instance i1client = new Instance("_i1_client", Arrays.asList("/logfiles/int/client/"),
-                "LMIGRAS1/backup/result/middletier/2021", Arrays.asList("*/*.gras.clientExceptionsGroup.log"));
-        Instance i1error = new Instance("_i1_error", Arrays.asList("/logfiles/int/error/"),
-                "LMIGRAS1/backup/result/middletier/2021", Arrays.asList("*/*.gras.errorGroup.log"));
-        Instance f1client = new Instance("_f1_client", Arrays.asList("/logfiles/func/client/"),
-                "LMFGRAS1/backup/result/middletier/2021", Arrays.asList("*/*.gras.clientExceptionsGroup.log"));
-        Instance f1error = new Instance("_f1_error", Arrays.asList("/logfiles/func/error/"),
-                "LMFGRAS1/backup/result/middletier/2021", Arrays.asList("*/*.gras.errorGroup.log"));
-        Instance cmb_i1 = new Instance("_cmb_i1_error", Arrays.asList("/logfiles/cmb_i1/"),
-                "LMICMB1/backup/result/middletier/2021", Arrays.asList("*/*.gras.errorGroup.log"));
-        Instance t1bclient = new Instance("_t1_b_client", Arrays.asList("/logfiles/test_b/client/"),
-                "LMTGRAS1B/backup/result/middletier/2021", Arrays.asList("*/*.gras.clientExceptionsGroup.log"));
-        Instance t1berror = new Instance("_t1_b_error", Arrays.asList("/logfiles/test_b/error/"),
-                "LMTGRAS1B/backup/result/middletier/2021", Arrays.asList("*/*.gras.errorGroup.log"));
-        Set<Instance> instanceSet = new HashSet<Instance>(Arrays.asList(
-                t1client, t1error, cmb_t1, t1bclient, t1berror));
+    public static Set<Instance> getInstanceSet(Properties properties) {
+        Set<Instance> instanceSet = new HashSet<Instance>();
+        for (String propName : properties.stringPropertyNames()) {
+            String[] propKeys = propName.split("_");
+            String env = propKeys[0];
+            if ("test".equals(env) || "int".equals(env) || "prod".equals(env)) {
+                String ctr = propKeys[2];
+                if (propName.equals(env + "_filteredlogfile_" + ctr)) {                                                             // This is a required prop
+                    instanceSet.add(new Instance(
+                            properties.getProperty(env + "_filteredlogfile_" + ctr)
+                            , Arrays.asList(properties.getProperty(env + "_localpaths_" + ctr))
+                            , properties.getProperty(env + "_serverpath_" + ctr)
+                            , Arrays.asList(properties.getProperty(env + "_logfiles_" + ctr))
+                    ));
+                }
+            }
+        }
 
         return instanceSet;
     }

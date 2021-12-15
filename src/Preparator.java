@@ -1,8 +1,11 @@
 import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Paths;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.LinkedHashSet;
+import java.util.Properties;
 import java.util.Set;
 
 public class Preparator {
@@ -20,13 +23,13 @@ public class Preparator {
         return dateFormat.format(dateRaw);
     }
 
-    public void getDailyFiles(String date) throws IOException {
-        String serverCommandAndPath = "scp ngd:/GRAS/share/GRASINST/";
+    public void getDailyFiles(Properties prop, String date) throws IOException {
+        String serverCommandAndPath = prop.getProperty("servercommand");
         Set<String> commands = new LinkedHashSet<>();
-        commands.add("mkdir -p " + basePath + date + "/nofilter/");
+        Files.createDirectories(Paths.get(basePath + date + "/nofilter/"));
         for (Instance i : instanceSet) {
             for (int j = 0; j < i.getServerFileNames().size(); j++) {
-                commands.add("mkdir -p " + basePath + date + i.getDirectoriesForLogFiles().get(j));
+                Files.createDirectories(Paths.get(basePath + date + i.getDirectoriesForLogFiles().get(j)));
                 commands.add(serverCommandAndPath + i.getServerPath() + date + i.getServerFileNames().get(j)
                         + " " + basePath + date + i.getDirectoriesForLogFiles().get(j));
             }
